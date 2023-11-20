@@ -5,6 +5,7 @@ import (
 	"os"
 	"slices"
 	"strings"
+	"time"
 )
 
 func (c *Core) Menu() {
@@ -43,20 +44,20 @@ func (c *Core) Output() {
 func readSelect() int {
 	var selected int
 	fmt.Fprint(os.Stderr, "\nSelect: ")
-	fmt.Scan(&selected)
+	fmt.Scanln(&selected)
 	return selected
 }
 
-func readMFAinput() *string {
+func readMFAinput() string {
 	var code string
 	fmt.Fprint(os.Stderr, "MFA Code: ")
-	fmt.Scan(&code)
+	fmt.Scanln(&code)
 	code = strings.TrimSpace(code)
-	return &code
+	return code
 }
 
-func readDurationInput() *int32 {
-	var hrs int32
+func readDurationInput() time.Duration {
+	var hrs int
 	fmt.Fprint(os.Stderr, "Duration in hours [1]: ")
 	fmt.Scanln(&hrs)
 	if hrs == 0 {
@@ -64,5 +65,5 @@ func readDurationInput() *int32 {
 	}
 
 	hrs *= 60 * 60
-	return &hrs
+	return time.Duration(hrs) * time.Second
 }
