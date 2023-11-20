@@ -1,28 +1,27 @@
 package core
 
 import (
-	"time"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 )
 
 func (c *Core) AssumeRole() error {
-	token := readMFAinput()
+	profile := c.Profiles[c.SelectedRole]
 	duration := readDurationInput()
-	staticTokenProvider := func() (string, error) {
-		return *token, nil
-	}
 
 	cfg, err := config.LoadDefaultConfig(
 		c.Context,
-		config.WithRegion(c.Profiles[c.SelectedRole].Region),
-		config.WithSharedConfigProfile(c.Profiles[c.SelectedRole].Name),
+		config.WithRegion(profile.Region),
+		config.WithSharedConfigProfile(profile.Name),
 		config.WithAssumeRoleCredentialOptions(func(aro *stscreds.AssumeRoleOptions) {
-			aro.TokenProvider = staticTokenProvider
-			aro.SerialNumber = aws.String(c.Profiles[c.SelectedRole].MfaSerial)
-			aro.Duration = time.Duration(*duration) * time.Second
+			if profile.MfaSerial != "" {
+				aro.SerialNumber = aws.String(profile.MfaSerial)
+				aro.TokenProvider = func() (string, error) {
+					return readMFAinput(), nil
+				}
+			}
+			aro.Duration = duration
 		}),
 	)
 	if err != nil {
