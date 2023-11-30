@@ -8,11 +8,11 @@ want it to.
 
 ## Usage
 
-Create an alias to execute: `alias aa='eval $(aws-role)'` and add it to
+Create an alias to execute: `alias creds='eval $(aws-role)'` and add it to
 `~/.bash_profile` or `~/.bashrc`.
 
 ```console
-$ aa
+$ creds
    1. bar-prod
    2. bar-staging
    3. foo-prod
